@@ -5,12 +5,12 @@ namespace ReadableTimeSpans
     public struct UnitOfTime
     {
         private readonly TimeSpan _timeSpan;
-        private readonly string _unit;
+        private readonly string _unitName;
 
-        public UnitOfTime(TimeSpan timeSpan, string unit) : this()
+        public UnitOfTime(TimeSpan timeSpan, string unitName) : this()
         {
             _timeSpan = timeSpan;
-            _unit = unit;
+            _unitName = unitName;
         }
 
         public long Ticks
@@ -18,9 +18,9 @@ namespace ReadableTimeSpans
             get { return _timeSpan.Ticks; }
         }
 
-        public string Unit
+        public string UnitName
         {
-            get { return _unit; }
+            get { return _unitName; }
         }
     }
 }

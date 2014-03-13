@@ -35,8 +35,8 @@ namespace ReadableTimeSpans
         private string Format(long wholeNumber)
         {
             var unit = wholeNumber == 1
-                ? _unitOfTime.Unit
-                : Pluralize(_unitOfTime.Unit);
+                ? _unitOfTime.UnitName
+                : Pluralize(_unitOfTime.UnitName);
 
             return string.Format("{0} {1}", wholeNumber, unit);
         }

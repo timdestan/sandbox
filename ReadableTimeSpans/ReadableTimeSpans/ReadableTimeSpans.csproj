@@ -39,6 +39,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmountOfTime.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="FormattingStep.cs" />
     <Compile Include="TimeSpanFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
