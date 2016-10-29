@@ -162,3 +162,12 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+
+#############
+## Haskell
+#############
+
+*.hi
+*.o
+haskell/*.exe
