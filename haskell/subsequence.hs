@@ -1,13 +1,11 @@
 
 data SizedList a = SNil | SCons a Int (SizedList a)
 
-ssize :: SizedList a -> Int
-ssize SNil = 0
-ssize (SCons _ s _) = s
-
 list2sized :: [a] -> SizedList a
 list2sized = foldr combine SNil
-  where combine a l = SCons a (1 + ssize l) l
+  where combine a l = SCons a (1 + size l) l
+        size SNil = 0
+        size (SCons _ s _) = s
 
 instance Foldable SizedList where
    foldr f z SNil = z
