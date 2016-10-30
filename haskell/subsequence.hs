@@ -1,18 +1,35 @@
 
+data SizedList a = SNil | SCons a Int (SizedList a)
+
+ssize :: SizedList a -> Int
+ssize SNil = 0
+ssize (SCons _ s _) = s
+
+list2sized :: [a] -> SizedList a
+list2sized = foldr combine SNil
+  where combine a l = SCons a (1 + ssize l) l
+
+instance Foldable SizedList where
+   foldr f z SNil = z
+   foldr f z (SCons x _ xs) = f x (foldr f z xs)
+
+sized2list :: SizedList a -> [a]
+sized2list = foldr (:) []
+
 -- Find the subsequences of the input list that are of the given size.
 subsequencesOfSize :: Int -> [a]  -> [[a]]
-subsequencesOfSize targetSize a = go targetSize (length a) a
+subsequencesOfSize targetSize a = go targetSize (list2sized a)
   where
-    go :: Int -> Int -> [a] -> [[a]]
-    go 0 _ _ = [[]]
-    go targetSize _ [] = []
-    go targetSize listSize l@(h:t)
+    go :: Int -> SizedList a -> [[a]]
+    go 0 _ = [[]]
+    go targetSize SNil = []
+    go targetSize l@(SCons h listSize t)
       | targetSize > listSize = []
-      | targetSize == listSize = [l]
+      | targetSize == listSize = [sized2list l]
       | otherwise = subsIncludingH ++ subsWithoutH
         where
-          subsIncludingH = map ((:) h) (go (targetSize - 1) (listSize - 1) t)
-          subsWithoutH  = go targetSize listSize t
+          subsIncludingH = map ((:) h) (go (targetSize - 1) t)
+          subsWithoutH  = go targetSize t
 
 -- Given two lists, a and b, finds the subsequence of b (of the same size as a)
 -- such that the sum of the pointwise absolute differences is minimized, and
@@ -43,6 +60,7 @@ main = do
                          -6, -20, -33, 10, 34, -7, -46, 0, 35, 29, 22, 19, -48,
                          -4, 10, -41, 26, -33, 45, -2, 24, 4, 39, -2, -42, 41,
                          18, -28, 28, -44, 19, 34, 41, 33, -27, -26, 41])
+  checkEq 0 (closest [1,2] [7,8,9,1,2,8])
     where
     checkEq a b = putStrLn $ check a b
     check a b | a == b = "Correct."
