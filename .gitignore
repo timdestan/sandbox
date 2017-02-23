@@ -171,3 +171,5 @@ pip-log.txt
 *.hi
 *.o
 haskell/*.exe
+haskell/subsequence
+haskell/diagrams
