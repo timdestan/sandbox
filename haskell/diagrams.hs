@@ -12,6 +12,15 @@ class Semigroup a where
 instance Semigroup [a] where
   (<>) = (++)
 
+newtype Max a = Max { getMax :: a }
+  deriving (Eq, Ord)
+
+instance Ord a => Semigroup (Max a) where
+  (<>) = max
+
+instance Semigroup r => Semigroup (a -> r) where
+  (f <> g) a = (f a) <> (g a)
+
 newtype Dual a = Dual { getDual :: a }
 
 instance Semigroup a => Semigroup (Dual a) where
@@ -29,22 +38,31 @@ none = Option Nothing
 some :: a -> Option a
 some = Option . Just
 
+instance Semigroup a => Semigroup (Option a) where
+  Option Nothing <> a = a
+  a <> Option Nothing = a
+  Option (Just a) <> Option (Just b) = some $ a <> b
+
 instance Semigroup a => Monoid (Option a) where
   mempty = none
-  Option Nothing `mappend` a = a
-  a `mappend` Option Nothing = a
-  Option (Just a) `mappend` Option (Just b) = some $ a <> b
+  mappend = (<>)
 
-data Pos = Pos { x :: Double, y :: Double}
+-- 2D point
+data P2 = P2 Double Double
+  deriving (Eq, Show, Ord)
 
-instance Show Pos where
-  show Pos { x, y } = "(" ++ (show x) ++ "," ++ (show y) ++ ")"
+-- 2D vector
+data V2 = V2 P2 P2
+  deriving (Eq, Show, Ord)
 
-data Prim = Circle { center :: Pos, radius :: Double }
-  deriving (Show)
+data Prim = Circle P2 Double
+  deriving (Eq, Show)
 
 newtype Diagram = Diagram (Dual [Prim])
   deriving (Semigroup, Monoid)
+
+instance Show Diagram where
+  show (Diagram (Dual ps)) = show $ reverse ps
 
 unD :: Diagram -> [Prim]
 unD (Diagram (Dual ps)) = ps
@@ -55,5 +73,25 @@ prim p = Diagram (Dual [p])
 mkD :: [Prim] -> Diagram
 mkD ps = Diagram (Dual ps)
 
+newtype Envelope = Envelope (Option(V2 -> Max Double))
+  deriving (Semigroup, Monoid)
+
+envelopeP :: Prim -> Envelope
+envelopeP = undefined
+
+translateP :: V2 -> Prim -> Prim
+translateP (V2 (P2 x0 y0) (P2 x1 y1))
+           (Circle (P2 xc yc) r) = Circle (P2 (xc + x1 - x0) (yc + y1 - y0)) r
+
+envelope :: Diagram -> Envelope
+envelope = hom envelopeP . unD
+
+translate :: V2 -> Diagram -> Diagram
+translate v = mkD . map (translateP v) . unD
+
+myDiagram = mkD [
+  Circle (P2 4 3) 2,
+  Circle (P2 5 2) 5 ]
+
 main =
-  putStrLn $ show Circle { center = Pos { x = 4, y = 3}, radius = 7 }
+  putStrLn $ show $ myDiagram
