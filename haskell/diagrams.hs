@@ -51,6 +51,8 @@ instance Semigroup a => Monoid (Option a) where
 data P2 = P2 Double Double
   deriving (Eq, Show, Ord)
 
+origin = P2 0 0
+
 -- 2D vector
 data V2 = V2 P2 P2
   deriving (Eq, Show, Ord)
@@ -93,5 +95,6 @@ myDiagram = mkD [
   Circle (P2 4 3) 2,
   Circle (P2 5 2) 5 ]
 
-main =
+main = do
   putStrLn $ show $ myDiagram
+  putStrLn $ show $ translate (V2 origin (P2 1 (-2))) myDiagram
